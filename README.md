@@ -2,6 +2,7 @@
 Mini-Project: Library Management System with MySQL Database Integration
 
 Command-line interface (CLI) for the Library Management System with separate menus for each class of the system.
+
 Main Menu:
   1. Book Operations
   2. User Operations
@@ -48,3 +49,6 @@ Run Windows Command Prompt as administrator.
 Run the following:
 
 $ mklink lib-db lib.bat
+
+# Overview of Modules
+
