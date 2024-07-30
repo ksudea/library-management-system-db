@@ -1,5 +1,4 @@
 import mysql.connector
-import random 
 
 db_name = "library_db"
 user = "root"
