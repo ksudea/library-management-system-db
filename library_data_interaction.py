@@ -6,6 +6,7 @@ user = "root"
 password = "0711"
 host = "127.0.0.1"
 
+# Add borrowed book to borrowed book table
 def add_borrowed_book(user_db_id, book_id, borrow_date):
     try:
         conn = mysql.connector.connect(
@@ -19,7 +20,6 @@ def add_borrowed_book(user_db_id, book_id, borrow_date):
         VALUES (%s, %s, %s, %s)"""
         cursor.execute(query, (user_db_id, book_id, borrow_date, 1))
         conn.commit()
-        print("Successfully checked out book!")
     except mysql.connector.Error as db_err:
         print(f"Database error: {db_err}")
     except Exception as e:
@@ -29,6 +29,7 @@ def add_borrowed_book(user_db_id, book_id, borrow_date):
             cursor.close()
             conn.close()
 
+# Return borrowed book by marking the return date and currently_checked_out fields in the borrowed book table
 def return_borrowed_book(user_db_id, book_id, borrow_date, return_date):
     try:
         conn = mysql.connector.connect(
@@ -42,7 +43,6 @@ def return_borrowed_book(user_db_id, book_id, borrow_date, return_date):
         WHERE user_id = %s AND book_id = %s AND borrow_date = %s;"""
         cursor.execute(query, (return_date, user_db_id, book_id, borrow_date))
         conn.commit()
-        print("Successfully returned book!")
     except mysql.connector.Error as db_err:
         print(f"Database error: {db_err}")
     except Exception as e:
@@ -52,6 +52,7 @@ def return_borrowed_book(user_db_id, book_id, borrow_date, return_date):
             cursor.close()
             conn.close()
 
+#Retrieve the date the book was borrowed by the user
 def get_borrowed_date(user_db_id, book_id):
     try:
         conn = mysql.connector.connect(
@@ -77,53 +78,7 @@ def get_borrowed_date(user_db_id, book_id):
             cursor.close()
             conn.close()
 
-def get_book_availability(book_id):
-    try:
-        conn = mysql.connector.connect(
-        database=db_name,
-        user=user,
-        password=password,
-        host=host,
-        consume_results=True)
-        cursor = conn.cursor()
-        query = """SELECT availability FROM books
-        WHERE id = %s"""
-        cursor.execute(query, (book_id,))
-        availability = cursor.fetchall()
-        if len(availability) == 0:
-                return None
-        return availability[0][0]
-    except mysql.connector.Error as db_err:
-        print(f"Database error: {db_err}")
-    except Exception as e:
-        print(f"Error: {e}")
-    finally:
-        if conn and conn.is_connected():
-            cursor.close()
-            conn.close()
-
-def change_book_availability(book_id, availability):
-    try:
-        conn = mysql.connector.connect(
-        database=db_name,
-        user=user,
-        password=password,
-        host=host,
-        consume_results=True)
-        cursor = conn.cursor()
-        query = """UPDATE books SET availability = %s 
-        WHERE id = %s;"""
-        cursor.execute(query, (availability,book_id))
-        conn.commit()
-    except mysql.connector.Error as db_err:
-        print(f"Database error: {db_err}")
-    except Exception as e:
-        print(f"Error: {e}")
-    finally:
-        if conn and conn.is_connected():
-            cursor.close()
-            conn.close()
-      
+#Get a list of books currently checked out by the given user from borrowed books table
 def get_borrowed_book_list(user_db_id):
     try:
         conn = mysql.connector.connect(
@@ -149,6 +104,7 @@ def get_borrowed_book_list(user_db_id):
             cursor.close()
             conn.close()
 
+#Add book to books table
 def add_book(title, author_id, ISBN, publication_date, genre_id):
     try:
         conn = mysql.connector.connect(
@@ -162,7 +118,6 @@ def add_book(title, author_id, ISBN, publication_date, genre_id):
         VALUES (%s, %s, %s, %s, %s, 1)"""
         cursor.execute(query, (title, author_id, genre_id, ISBN, publication_date))
         conn.commit()
-        print("Successfully added book!")
     except mysql.connector.Error as db_err:
         print(f"Database error: {db_err}")
     except Exception as e:
@@ -172,6 +127,7 @@ def add_book(title, author_id, ISBN, publication_date, genre_id):
             cursor.close()
             conn.close()
 
+#Retrieve row corresponding to this id
 def get_book_by_id(id):
     try:
             conn = mysql.connector.connect(
@@ -197,6 +153,7 @@ def get_book_by_id(id):
                 cursor.close()
                 conn.close()
 
+#Retrieve book title corresponding to this table id 
 def get_book_title_by_id(id):
     try:
             conn = mysql.connector.connect(
@@ -223,6 +180,56 @@ def get_book_title_by_id(id):
                 cursor.close()
                 conn.close()
 
+#Retrieve book availability from books table
+def get_book_availability(book_id):
+    try:
+        conn = mysql.connector.connect(
+        database=db_name,
+        user=user,
+        password=password,
+        host=host,
+        consume_results=True)
+        cursor = conn.cursor()
+        query = """SELECT availability FROM books
+        WHERE id = %s"""
+        cursor.execute(query, (book_id,))
+        availability = cursor.fetchall()
+        if len(availability) == 0:
+                return None
+        return availability[0][0]
+    except mysql.connector.Error as db_err:
+        print(f"Database error: {db_err}")
+    except Exception as e:
+        print(f"Error: {e}")
+    finally:
+        if conn and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+#Change book availability to 0 or 1 in books table
+def change_book_availability(book_id, availability):
+    try:
+        conn = mysql.connector.connect(
+        database=db_name,
+        user=user,
+        password=password,
+        host=host,
+        consume_results=True)
+        cursor = conn.cursor()
+        query = """UPDATE books SET availability = %s 
+        WHERE id = %s;"""
+        cursor.execute(query, (availability,book_id))
+        conn.commit()
+    except mysql.connector.Error as db_err:
+        print(f"Database error: {db_err}")
+    except Exception as e:
+        print(f"Error: {e}")
+    finally:
+        if conn and conn.is_connected():
+            cursor.close()
+            conn.close()
+      
+#Retrieve book row corresponding to this ISBN in books table
 def get_book_by_ISBN(isbn):
     try:
             conn = mysql.connector.connect(
@@ -248,6 +255,7 @@ def get_book_by_ISBN(isbn):
                 cursor.close()
                 conn.close()
 
+#Retrieve book title corresponding to this ISBN in books table
 def get_book_title_by_ISBN(id):
     try:
             conn = mysql.connector.connect(
@@ -275,6 +283,7 @@ def get_book_title_by_ISBN(id):
                 cursor.close()
                 conn.close()
 
+#Retrieve book table/database id corresponding to this ISBN in books table
 def get_book_id_by_ISBN(isbn):
     try:
             conn = mysql.connector.connect(
@@ -300,6 +309,7 @@ def get_book_id_by_ISBN(isbn):
                 cursor.close()
                 conn.close()
 
+#Retrieve all rows in books table
 def get_all_books():
     try:
             conn = mysql.connector.connect(
@@ -324,6 +334,7 @@ def get_all_books():
                 cursor.close()
                 conn.close()
 
+##Retrieve book row corresponding to this ISBN in books table
 def search_books_by_ISBN(isbn):
     try:
             conn = mysql.connector.connect(
@@ -349,6 +360,7 @@ def search_books_by_ISBN(isbn):
                 cursor.close()
                 conn.close()
 
+##Retrieve all book rows corresponding to this title in books table
 def search_books_by_title(title):
     try:
             conn = mysql.connector.connect(
@@ -373,6 +385,7 @@ def search_books_by_title(title):
                 cursor.close()
                 conn.close()
 
+#Retrieve book rows corresponding to this author id in books table
 def search_books_by_author_id(author_id):
     try:
             conn = mysql.connector.connect(
@@ -397,6 +410,7 @@ def search_books_by_author_id(author_id):
                 cursor.close()
                 conn.close()
 
+#Add author to authors table
 def add_author(name, bio):
     try:
         conn = mysql.connector.connect(
@@ -420,6 +434,7 @@ def add_author(name, bio):
             cursor.close()
             conn.close()
 
+##Retrieve author row corresponding to this id in authors table
 def get_author_by_id(id):
     try:
             conn = mysql.connector.connect(
@@ -445,6 +460,7 @@ def get_author_by_id(id):
                 cursor.close()
                 conn.close()
 
+#Retrieve author name corresponding to this id in authors table
 def get_author_name_by_id(id):
     try:
             conn = mysql.connector.connect(
@@ -469,6 +485,7 @@ def get_author_name_by_id(id):
                 cursor.close()
                 conn.close()
 
+#Retrieve author id corresponding to this name in authors table
 def get_author_id_by_name(author_name):
     try:
             conn = mysql.connector.connect(
@@ -493,6 +510,7 @@ def get_author_id_by_name(author_name):
                 cursor.close()
                 conn.close()
 
+#Retrieve all rows in authors table
 def get_all_authors():
     try:
             conn = mysql.connector.connect(
@@ -517,6 +535,7 @@ def get_all_authors():
                 cursor.close()
                 conn.close()
 
+#Add user to user table
 def add_user(name, user_id):
     try:
         conn = mysql.connector.connect(
@@ -540,6 +559,7 @@ def add_user(name, user_id):
             cursor.close()
             conn.close()
 
+#Retrieve user's table/database id corresponding to this user_id (library usage) in users table
 def get_user_database_id(user_id):
     try:
             conn = mysql.connector.connect(
@@ -563,7 +583,8 @@ def get_user_database_id(user_id):
             if conn and conn.is_connected():
                 cursor.close()
                 conn.close()
-            
+
+#Retrieve user row corresponding to this user_id (library usage) in users table
 def get_user_by_user_id(user_id):
     try:
             conn = mysql.connector.connect(
@@ -588,6 +609,7 @@ def get_user_by_user_id(user_id):
                 cursor.close()
                 conn.close()
 
+#Retrieve all rows in users table
 def get_all_users():
     try:
             conn = mysql.connector.connect(
@@ -612,6 +634,7 @@ def get_all_users():
                 cursor.close()
                 conn.close()
 
+#Add new genre to genres table
 def add_genre(name, description, category):
     try:
         conn = mysql.connector.connect(
@@ -635,6 +658,7 @@ def add_genre(name, description, category):
             cursor.close()
             conn.close()
 
+#Retrieve genre row corresponding to this id in the genres table
 def get_genre_by_id(id):
     try:
             conn = mysql.connector.connect(
@@ -660,6 +684,7 @@ def get_genre_by_id(id):
                 cursor.close()
                 conn.close()
 
+#Retrieve genre name corresponding to this id in the genres table
 def get_genre_name_by_id(id):
     try:
             conn = mysql.connector.connect(
@@ -684,6 +709,7 @@ def get_genre_name_by_id(id):
                 cursor.close()
                 conn.close()
 
+#Retrieve genre id corresponding to this name in the genres table
 def get_genre_id_by_name(genre_name):
     try:
             conn = mysql.connector.connect(
@@ -709,6 +735,7 @@ def get_genre_id_by_name(genre_name):
                 cursor.close()
                 conn.close()
 
+#Retrieve all rows of genres table
 def get_all_genres():
       try:
             conn = mysql.connector.connect(

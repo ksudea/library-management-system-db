@@ -1,13 +1,15 @@
 # Module for the library management system: storing and interacting with library data such as books, users, authors, and genres.  
 import library_data_interaction as di
 from library_classes import Genre, Book, User, Author
-import mysql.connector
 from datetime import datetime, date
 
 db_name = "library_management_db"
 user = "root"
 password = "0711"
 host = "127.0.0.1"
+
+#Add book to database, with genre details optional.
+#If inputted author and/or genre do not exist in the database already, adds them to their respective tables.
 
 def add_book(title, author, ISBN, publication_date, genre_name, genre_description, genre_category):
     try:
@@ -28,7 +30,7 @@ def add_book(title, author, ISBN, publication_date, genre_name, genre_descriptio
     except Exception as e:
         print(f"Error occurred: {e}")
 
-
+#Allows user with user_id to borrow book with ISBN if book is not already checked out (book availability)
 def borrow_book(user_id, ISBN):
     try:
         book_id = di.get_book_id_by_ISBN(ISBN)
@@ -44,6 +46,7 @@ def borrow_book(user_id, ISBN):
     except Exception as e:
         print(f"Error occurred: {e}")
 
+#Allows user to return book, also reverting the book availability to available
 def return_book(user_id, ISBN):
     try:
         book_id = di.get_book_id_by_ISBN(ISBN)
@@ -57,6 +60,8 @@ def return_book(user_id, ISBN):
     except Exception as e:
         print(f"Error occurred: {e}")
 
+#Allows you to search by ISBN, title, or author.
+#ISBN search necessarily returns 1 book but title/author searches may return many
 def search_for_book(ISBN="", title="", author=""):
     try:
         if ISBN == "" and title == "" and author == "":
@@ -65,7 +70,7 @@ def search_for_book(ISBN="", title="", author=""):
             book = di.search_books_by_ISBN(ISBN)
             display_book(book)
             return "Finished"
-        elif title != "" and author == "":
+        elif title != "":
             books = di.search_books_by_title(title)
             for book in books:
                 display_book(book)
@@ -80,6 +85,7 @@ def search_for_book(ISBN="", title="", author=""):
     except Exception as e:
         print(f"Error occurred: {e}")
 
+#Display all books in library
 def display_all_books():
     try:
         books = di.get_all_books()
@@ -88,6 +94,7 @@ def display_all_books():
     except Exception as e:
         print(f"Error occurred: {e}")
 
+#Helper function for printing the details of a book based on the returned row from the books table in our database
 def display_book(book):
     try:
             book_author = ""
@@ -105,6 +112,7 @@ def display_book(book):
     except Exception as e:
         print(f"Error occurred: {e}")
 
+#Adds user
 def add_user(name, id):
     try:
         new_user = User(name, id, {})
@@ -113,6 +121,7 @@ def add_user(name, id):
     except Exception as e:
         print(f"Error occurred: {e}")
 
+#Displays details of a user with user_id
 def view_user_details(user_id):
     try:
         user = di.get_user_by_user_id(user_id)
@@ -135,6 +144,7 @@ def view_user_details(user_id):
     except Exception as e:
         print(f"Error occurred: {e}")
 
+#Displays all library users
 def display_all_users():
     try:
         users = di.get_all_users()
@@ -143,6 +153,7 @@ def display_all_users():
     except Exception as e:
         print(f"Error occurred: {e}")
 
+#Add new author with optional biography
 def add_author(name, bio):
     try:
         new_author = Author(name, bio)
@@ -151,6 +162,7 @@ def add_author(name, bio):
     except Exception as e:
         print(f"Error occurred: {e}")
 
+#Display author details by inputted name
 def view_author_details(name):
     try:
         author_id = di.get_author_id_by_name(str(name))
@@ -162,6 +174,7 @@ def view_author_details(name):
     except Exception as e:
         print(f"Error occurred: {e}")
 
+#Displays all authors stored in the library
 def display_all_authors():
     try:
         authors = di.get_all_authors()
@@ -170,6 +183,7 @@ def display_all_authors():
     except Exception as e:
         print(f"Error occurred: {e}")
 
+#Add new genre
 def add_genre(name, description, category):
     try:
         new_genre = Genre(name, description, category)
@@ -178,6 +192,7 @@ def add_genre(name, description, category):
     except Exception as e:
         print(f"Error occurred: {e}")
 
+#View details of a genre by its name
 def view_genre_details(name):
     try:
         genre_id = int(di.get_genre_id_by_name(name))
@@ -189,6 +204,7 @@ def view_genre_details(name):
     except Exception as e:
        print(f"Error occurred: {e}")
 
+#Display all genres in library
 def display_all_genres():
     try:
         genres = di.get_all_genres()

@@ -18,6 +18,7 @@ def book_ISBN_validate(isbn):
           return True
     return False
 
+#Format the book ISBN to conform to the database table
 def book_ISBN_database_format(isbn):
      db_isbn = re.sub('[ ,-]', '', isbn)
      return db_isbn
@@ -30,6 +31,7 @@ def book_publication_date_validate(date):
           return True
     return False
 
+#Format the book publication date to conform to the database table
 def book_date_database_format(date):
      db_date = re.sub('[ ,-]', '/', date)
      return db_date
