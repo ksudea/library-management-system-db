@@ -50,6 +50,10 @@ Run the following:
 
 $ mklink lib-db lib.bat
 
+# Demo Video
+
+https://youtu.be/QNWSgcmefwo
+
 # Overview of Modules
 
 1. library_interface.py handles the bulk of user interaction/input and menu options.
@@ -63,3 +67,5 @@ $ mklink lib-db lib.bat
 
 
 Note: The repository also includes a text file of sample ISBNs to use when adding books to the library. 
+
+Repo: https://github.com/ksudea/library-management-system-db/
